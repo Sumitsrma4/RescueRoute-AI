@@ -4,6 +4,12 @@ An early working frontend prototype for Ideathon 2026 that demonstrates how scat
 
 The initial use case is Bengaluru, but the workflow is designed to support waterlogging, fallen trees, fires, lightning injuries, road accidents and other large-scale emergencies.
 
+## Live prototype
+
+**[Open the hosted RescueRoute AI prototype](https://rescueroute-ai-prototype.sumit158845.chatgpt.site)**
+
+The hosted version is public and uses simulated data. It does not connect to emergency services or provide real route-safety guarantees.
+
 ## Prime-question workflow
 
 The prototype focuses on one connected decision loop:
