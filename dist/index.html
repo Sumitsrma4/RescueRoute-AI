@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="RescueRoute AI - an early disaster situational awareness and response coordination prototype.">
+  <title>RescueRoute AI Prototype</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="demo-ribbon" role="note">
+    <span>IDEATHON PROTOTYPE</span>
+    <strong>Simulated data — not for real emergency use</strong>
+  </div>
+
+  <header class="app-header">
+    <a class="brand" href="#" aria-label="RescueRoute AI home">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 40 40"><path d="M20 4 33 10v9c0 8.1-5.4 14-13 17-7.6-3-13-8.9-13-17v-9l13-6Z"/><path class="brand-route" d="m12.5 23 5-5 4 4 7-7"/></svg>
+      </span>
+      <span><strong>RescueRoute</strong><small>Response intelligence</small></span>
+    </a>
+
+    <nav class="main-nav" aria-label="Primary navigation">
+      <button class="nav-item is-active" data-view="situation" aria-current="page">Situation</button>
+      <button class="nav-item" data-view="report">Report incident</button>
+      <button class="nav-item" data-view="coordination">Coordination <span class="nav-count" id="navQueueCount">3</span></button>
+    </nav>
+
+    <div class="header-actions">
+      <button class="text-button" id="demoGuideButton">Demo guide</button>
+      <label class="connection-control" for="connectionToggle">
+        <span class="connection-dot" aria-hidden="true"></span>
+        <span id="connectionText">Online</span>
+        <input id="connectionToggle" type="checkbox" checked aria-label="Toggle simulated connection">
+      </label>
+    </div>
+  </header>
+
+  <main>
+    <section class="view is-visible" id="situationView" data-view-panel="situation">
+      <div class="page-heading situation-heading">
+        <div>
+          <p class="eyebrow">Bengaluru operational picture</p>
+          <h1>Know what is happening.<br><span>Coordinate what happens next.</span></h1>
+        </div>
+        <div class="heading-actions">
+          <p class="last-updated"><span class="pulse-dot"></span> Updated <strong id="lastUpdated">just now</strong></p>
+          <button class="primary-button" data-go-view="report">+ Report incident</button>
+        </div>
+      </div>
+
+      <div class="status-strip" aria-label="Situation summary">
+        <article><span class="status-icon critical-icon">!</span><div><strong id="activeCount">4</strong><small>Active incidents</small></div></article>
+        <article><span class="status-icon review-icon">?</span><div><strong id="unverifiedCount">2</strong><small>Need verification</small></div></article>
+        <article><span class="status-icon route-icon">↗</span><div><strong id="routeCount">2</strong><small>Road disruptions</small></div></article>
+        <article><span class="status-icon response-icon">✓</span><div><strong id="assignedCount">1</strong><small>Resources assigned</small></div></article>
+      </div>
+
+      <div class="situation-layout">
+        <section class="map-panel" aria-label="Incident map">
+          <div class="map-toolbar">
+            <div class="segmented-control" role="group" aria-label="Map incident filter">
+              <button class="is-active" data-map-filter="all">All</button>
+              <button data-map-filter="critical">Critical</button>
+              <button data-map-filter="unverified">Unverified</button>
+            </div>
+            <div class="map-legend" aria-label="Map legend">
+              <span><i class="legend-dot verified"></i>Verified</span>
+              <span><i class="legend-dot unverified"></i>Unverified</span>
+            </div>
+          </div>
+
+          <div class="map-canvas" id="mapCanvas">
+            <svg class="city-map" viewBox="0 0 900 560" role="img" aria-label="Illustrative Bengaluru response map with major roads and neighbourhood labels">
+              <defs>
+                <pattern id="minorGrid" width="52" height="52" patternUnits="userSpaceOnUse">
+                  <path d="M52 0H0v52" fill="none" stroke="#d9dfdc" stroke-width="1" opacity=".55"/>
+                </pattern>
+                <filter id="roadShadow"><feDropShadow dx="0" dy="1" stdDeviation="1" flood-opacity=".12"/></filter>
+              </defs>
+              <rect width="900" height="560" fill="#e8edea"/>
+              <rect width="900" height="560" fill="url(#minorGrid)"/>
+              <g class="parks"><path d="M59 72c58-38 141-21 166 31 16 33-6 72-48 88-57 22-134 3-151-41-11-28 3-57 33-78Z"/><path d="M608 403c70-39 173-21 198 42 19 48-30 93-101 95-70 2-135-31-134-73 0-24 13-45 37-64Z"/></g>
+              <g class="water"><path d="M-30 421C129 364 175 500 333 447s254-74 368-4 183 22 240-25"/></g>
+              <g class="roads" filter="url(#roadShadow)">
+                <path class="arterial" d="M-25 319C123 294 238 254 358 260s230 100 359 71 150-71 212-97"/>
+                <path class="arterial" d="M242-20c5 130 32 202 92 275s74 176 73 330"/>
+                <path class="arterial" d="M647-20c-54 116-63 205-29 273s74 137 90 327"/>
+                <path d="M61 211c130-32 214-24 326 28s204 39 361-8"/>
+                <path d="M92 454c99-36 192-41 289-15s203 18 311-25"/>
+                <path d="M102 31c54 96 75 197 59 304s11 162 65 242"/>
+                <path d="M493-17c-15 119-6 227 43 305s48 175 13 296"/>
+                <path d="M783 24c-61 76-88 152-79 231s44 166 109 279"/>
+              </g>
+              <g class="neighbourhoods">
+                <text x="92" y="129">RAJAJINAGAR</text><text x="361" y="106">MALLESHWARAM</text>
+                <text x="662" y="127">HEBBAL</text><text x="98" y="378">VIJAYANAGAR</text>
+                <text x="400" y="351">MG ROAD</text><text x="697" y="375">INDIRANAGAR</text>
+                <text x="371" y="502">JAYANAGAR</text><text x="710" y="501">KORAMANGALA</text>
+              </g>
+            </svg>
+            <div id="mapMarkers" class="map-markers"></div>
+
+            <div class="map-callout" id="mapCallout" hidden>
+              <button class="callout-close" aria-label="Close incident preview">×</button>
+              <p class="callout-meta" id="calloutMeta"></p>
+              <h3 id="calloutTitle"></h3>
+              <p id="calloutLocation"></p>
+              <div class="callout-badges" id="calloutBadges"></div>
+              <button class="link-button" id="calloutDetails">Open incident details →</button>
+            </div>
+
+            <div class="map-safety-note"><span>i</span> Illustrative map. Conditions and routes are simulated.</div>
+          </div>
+        </section>
+
+        <aside class="incident-sidebar" aria-label="Current incidents">
+          <div class="panel-title-row">
+            <div><p class="eyebrow">Live queue</p><h2>Current incidents</h2></div>
+            <span class="count-pill" id="incidentListCount">4 reports</span>
+          </div>
+          <div class="filter-row">
+            <label class="search-field"><span aria-hidden="true">⌕</span><input id="incidentSearch" type="search" placeholder="Search area or incident" aria-label="Search incidents"></label>
+            <select id="incidentStatusFilter" aria-label="Filter incident status">
+              <option value="all">All status</option>
+              <option value="verified">Verified</option>
+              <option value="unverified">Unverified</option>
+              <option value="review">Under review</option>
+            </select>
+          </div>
+          <div class="incident-list" id="incidentList"></div>
+        </aside>
+      </div>
+
+      <section class="route-checker">
+        <div class="route-copy">
+          <span class="feature-number">02</span>
+          <div><p class="eyebrow">Changing ground conditions</p><h2>Check route exposure</h2><p>See whether a planned route intersects a reported disruption before dispatching help.</p></div>
+        </div>
+        <div class="route-form">
+          <label>From<select id="routeFrom"><option>Victoria Hospital</option><option>Indiranagar Fire Station</option><option>Hebbal Response Hub</option></select></label>
+          <span class="route-arrow">→</span>
+          <label>To<select id="routeTo"><option>Rajajinagar 2nd Block</option><option>MG Road</option><option>Koramangala</option></select></label>
+          <button class="dark-button" id="checkRouteButton">Check route</button>
+        </div>
+        <div class="route-result" id="routeResult" hidden>
+          <div class="route-alert-icon">!</div>
+          <div><strong>Reported hazard intersects the fastest route</strong><p>Waterlogging near Rajajinagar. Last report 8 minutes ago; verification is still pending.</p></div>
+          <div class="route-options"><span><small>Fastest</small><strong>24 min</strong><em>Risk reported</em></span><span class="recommended"><small>Alternative</small><strong>31 min</strong><em>Lower reported risk</em></span></div>
+        </div>
+      </section>
+
+      <section class="problem-proof">
+        <div class="section-heading"><p class="eyebrow">Why each step exists</p><h2>From scattered reports to coordinated action</h2><p>The prototype makes the Prime Question visible as one connected workflow.</p></div>
+        <div class="workflow-steps">
+          <article><span>1</span><h3>Collect</h3><p>Citizens and authorised sources add incidents to one operational picture.</p><em>Problem 1</em></article>
+          <article><span>2</span><h3>Verify</h3><p>Freshness, duplicates and conflicts remain visible instead of being hidden.</p><em>Problems 2–3</em></article>
+          <article><span>3</span><h3>Prioritise</h3><p>Urgency is suggested with reasons based on danger, people and access.</p><em>Problems 3–4</em></article>
+          <article><span>4</span><h3>Coordinate</h3><p>A human coordinator verifies, assigns a resource and updates the response.</p><em>Problems 4–5</em></article>
+        </div>
+      </section>
+    </section>
+
+    <section class="view" id="reportView" data-view-panel="report">
+      <div class="form-page">
+        <aside class="form-intro">
+          <button class="back-button" data-go-view="situation">← Back to situation</button>
+          <p class="eyebrow">Citizen and field reporting</p>
+          <h1>Report what you can see.</h1>
+          <p>Short, structured reports help coordinators build a clearer picture. Unknown information can remain unknown.</p>
+          <div class="form-principles">
+            <article><span>1</span><div><strong>Describe, don’t diagnose</strong><p>Share observable facts such as water level, smoke, injuries or blocked access.</p></div></article>
+            <article><span>2</span><div><strong>Uncertainty stays visible</strong><p>Your report starts as unverified until a coordinator reviews supporting information.</p></div></article>
+            <article><span>3</span><div><strong>Works with weak connectivity</strong><p>If offline, the report is saved on this device and marked for synchronisation.</p></div></article>
+          </div>
+          <div class="emergency-note"><strong>Immediate danger?</strong><p>Contact official emergency services. RescueRoute supports coordination; it does not replace them.</p></div>
+        </aside>
+
+        <form class="incident-form" id="incidentForm">
+          <div class="form-heading"><span class="form-step">New report</span><h2>Incident details</h2><p>Fields marked * are required. This demo does not upload data.</p></div>
+          <div class="form-grid">
+            <label class="full">What happened? *
+              <div class="incident-type-grid" role="radiogroup" aria-label="Incident type">
+                <label><input type="radio" name="type" value="Waterlogging" required><span class="type-icon">≈</span><strong>Waterlogging</strong></label>
+                <label><input type="radio" name="type" value="Fallen tree"><span class="type-icon">♣</span><strong>Fallen tree</strong></label>
+                <label><input type="radio" name="type" value="Fire"><span class="type-icon">△</span><strong>Fire / smoke</strong></label>
+                <label><input type="radio" name="type" value="Lightning injury"><span class="type-icon">ϟ</span><strong>Lightning injury</strong></label>
+                <label><input type="radio" name="type" value="Road accident"><span class="type-icon">◇</span><strong>Road accident</strong></label>
+                <label><input type="radio" name="type" value="Other"><span class="type-icon">+</span><strong>Other</strong></label>
+              </div>
+            </label>
+            <label class="full">Location or landmark *<input name="location" required placeholder="e.g. Rajajinagar 2nd Block, near metro station"></label>
+            <label>When did you observe it? *<input name="time" type="datetime-local" required></label>
+            <label>Source type<select name="source"><option>Citizen report</option><option>Field volunteer</option><option>Hospital</option><option>Emergency responder</option><option>Authority</option></select></label>
+            <label class="full">What can you observe? *<textarea name="description" required rows="4" placeholder="Describe visible conditions, people affected and access problems..."></textarea></label>
+            <fieldset class="full impact-fields">
+              <legend>Known impact</legend>
+              <label><input name="injury" type="checkbox"> Injury or medical need reported</label>
+              <label><input name="blocked" type="checkbox"> Road or access fully blocked</label>
+              <label><input name="emergencyAccess" type="checkbox"> Emergency vehicle access affected</label>
+              <label><input name="peopleAffected" type="number" min="0" placeholder="Estimated people affected" aria-label="Estimated people affected"></label>
+            </fieldset>
+            <label class="full">Optional evidence
+              <div class="upload-placeholder"><span>＋</span><strong>Add photo or short video</strong><small>Visual placeholder only in this early prototype</small></div>
+            </label>
+          </div>
+          <div class="form-actions"><button type="button" class="secondary-button" data-go-view="situation">Cancel</button><button type="submit" class="primary-button">Submit incident report</button></div>
+        </form>
+      </div>
+    </section>
+
+    <section class="view" id="coordinationView" data-view-panel="coordination">
+      <div class="page-heading compact-heading">
+        <div><p class="eyebrow">Human-reviewed response</p><h1>Coordination queue</h1><p>Review system suggestions, confirm uncertainty and connect urgent needs to available resources.</p></div>
+        <div class="heading-actions"><button class="secondary-button" id="resetDemoButton">Reset demo data</button><button class="primary-button" data-go-view="report">+ New field report</button></div>
+      </div>
+
+      <div class="coordination-summary">
+        <article><small>Needs review</small><strong id="reviewSummary">3</strong><span class="trend urgent">Action needed</span></article>
+        <article><small>Critical priority</small><strong id="criticalSummary">2</strong><span class="trend">Explainable ranking</span></article>
+        <article><small>Awaiting resource</small><strong id="resourceSummary">3</strong><span class="trend">Assignment gap</span></article>
+        <article><small>Queued offline</small><strong id="offlineSummary">0</strong><span class="trend">Sync on reconnect</span></article>
+      </div>
+
+      <div class="coordination-layout">
+        <section class="queue-panel">
+          <div class="panel-title-row">
+            <div><p class="eyebrow">Suggested order</p><h2>Priority queue</h2></div>
+            <select id="queueFilter" aria-label="Filter priority queue"><option value="all">All priorities</option><option value="critical">Critical</option><option value="high">High</option><option value="medium">Medium</option></select>
+          </div>
+          <div class="queue-explanation"><span>i</span><p>Order is suggested from reported danger, medical need, people affected, access disruption and freshness. A coordinator makes the final decision.</p></div>
+          <div id="priorityQueue" class="priority-queue"></div>
+        </section>
+
+        <aside class="resources-panel">
+          <div class="panel-title-row"><div><p class="eyebrow">Response capacity</p><h2>Available resources</h2></div><span class="count-pill">Demo inventory</span></div>
+          <div id="resourceList" class="resource-list"></div>
+          <div class="resource-gap"><span>!</span><div><strong>1 capability gap</strong><p>No high-clearance rescue vehicle is currently marked available near Rajajinagar.</p></div></div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <div class="connection-banner" id="connectionBanner" hidden>
+    <span>Offline simulation</span><p>New reports will be saved on this device and queued for synchronisation.</p>
+  </div>
+
+  <div class="toast-region" id="toastRegion" aria-live="polite" aria-atomic="true"></div>
+
+  <div class="drawer-backdrop" id="drawerBackdrop" hidden></div>
+  <aside class="incident-drawer" id="incidentDrawer" aria-hidden="true" aria-labelledby="drawerTitle">
+    <button class="drawer-close" id="drawerClose" aria-label="Close incident details">×</button>
+    <div id="drawerContent"></div>
+  </aside>
+
+  <dialog class="guide-dialog" id="guideDialog">
+    <button class="dialog-close" id="guideClose" aria-label="Close demo guide">×</button>
+    <p class="eyebrow">5-minute team walkthrough</p>
+    <h2>Demonstrate the full response loop</h2>
+    <ol>
+      <li><span>1</span><div><strong>Start with the situation map</strong><p>Show scattered reports combined into one view with verification and freshness.</p></div></li>
+      <li><span>2</span><div><strong>Open a map incident</strong><p>Explain the uncertainty, duplicate signals and why a priority was suggested.</p></div></li>
+      <li><span>3</span><div><strong>Submit a waterlogging report</strong><p>Add access disruption and medical impact to show explainable analysis.</p></div></li>
+      <li><span>4</span><div><strong>Review it in Coordination</strong><p>Verify the report, assign a resource and change response status.</p></div></li>
+      <li><span>5</span><div><strong>Check a route</strong><p>Show a warning and lower-risk alternative without claiming either route is safe.</p></div></li>
+      <li><span>6</span><div><strong>Toggle Offline</strong><p>Submit another report, then reconnect and show the queued item synchronise.</p></div></li>
+    </ol>
+    <button class="primary-button full-button" id="startDemoButton">Start on situation map</button>
+  </dialog>
+
+  <template id="iconTemplate">
+    <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3v18M3 12h18"/></svg>
+  </template>
+  <script src="app.js"></script>
+</body>
+</html>

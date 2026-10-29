@@ -1,0 +1,14 @@
+# Local development files
+.DS_Store
+Thumbs.db
+*.log
+
+# Share packages
+*.zip
+
+# Local hosting identity
+.openai/
+
+# Editor settings
+.vscode/
+.idea/
