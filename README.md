@@ -34,18 +34,23 @@ All incidents, AI suggestions, resources, updates and response actions are simul
 - Official emergency call links for 112 and 108
 - Verified Bengaluru hospital locations with Google Maps links
 - Clear freshness, verification and simulation labels
+- Duplicate-report confirmation that strengthens an existing incident without creating map clutter
+- Refresh, loading, empty, stale and retry states for changing conditions
 
 ### Responder access
 
 - Separate demo sign-in for authorised response users
 - Disaster situation overview with map-linked AI priority snapshot
+- Click-through from any responder map incident directly into its queue decision
 - Smart response queue with explainable ranking and uncertainty
 - Required human verification checklist and verification note
 - Ranked resource recommendations with simulated distance, ETA and capability fit
 - Human verification, resource assignment and status update controls
 - Response resource dashboard
+- Resource lifecycle controls for assigned, en route, on scene and released states
 - Public-alert preview and human-approved publication to the simulated citizen feed
 - Decision timeline for accountability
+- Validated demo credentials, keyboard-friendly review sections and a guided resettable walkthrough
 
 ## Why this scope
 
@@ -88,11 +93,12 @@ Open `http://127.0.0.1:4173`.
 ## Suggested walkthrough
 
 1. Open the public situation view and show the map layers.
-2. Submit a three-question incident report.
-3. Show that it appears as unverified with a simulated priority suggestion.
+2. Submit a three-question incident report and demonstrate the duplicate check when a nearby match exists.
+3. Show that a new report appears as unverified with a simulated priority suggestion and freshness label.
 4. Use **Responder sign in** and open the response queue.
-5. Review the reasons and uncertainty, then verify and assign a resource.
-6. Return to the public view to show the updated incident status.
+5. Review reasons, uncertainty and stale-data warnings, then verify and assign a resource.
+6. Move the resource through en route, on scene and released states.
+7. Return to the public view to show the updated incident status.
 
 ## Project structure
 

@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const STORAGE_KEY = "rescueroute-prototype-state-v2";
+  const STORAGE_KEY = "rescueroute-prototype-state-v3";
   const priorityRank = { critical: 4, high: 3, medium: 2, low: 1 };
   const priorityColor = { critical: "#c43f3b", high: "#b66a17", medium: "#356c92", low: "#17806b" };
   const symbols = { Waterlogging: "≈", Fire: "△", "Road blocked": "×", Injury: "+", Other: "?" };
@@ -9,17 +9,17 @@
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 
   const seedIncidents = [
-    { id: "RR-1047", type: "Injury", title: "Lightning injury reported", location: "Cubbon Park, north entrance", description: "One person reportedly collapsed after a nearby lightning strike. Medical assistance requested.", priority: "critical", score: 92, verification: "review", status: "new", updatedMinutes: 3, peopleAffected: 1, injury: true, blocked: false, resource: null, x: 51, y: 48, reasons: ["Medical need reported", "Immediate danger", "Very recent report"], uncertainty: "One public report; exact patient condition is unconfirmed.", timeline: [{ label: "Citizen report received", detail: "3 min ago" }, { label: "AI suggestion created", detail: "Critical · awaiting human review" }] },
-    { id: "RR-1048", type: "Waterlogging", title: "Severe waterlogging", location: "Rajajinagar 2nd Block", description: "Waist-deep water reported across the road. A bus is stalled and local access is blocked.", priority: "critical", score: 87, verification: "review", status: "new", updatedMinutes: 8, peopleAffected: 24, injury: false, blocked: true, resource: null, x: 25, y: 50, reasons: ["24 people may be affected", "Road access blocked", "Nearby related report"], uncertainty: "Two related reports are present, but water depth still needs responder confirmation.", timeline: [{ label: "Two reports linked", detail: "8 min ago" }, { label: "Access risk flagged", detail: "No resource assigned" }] },
-    { id: "RR-1049", type: "Fire", title: "Smoke from commercial building", location: "MG Road, Brigade junction", description: "Dark smoke visible from an upper floor. Occupancy is unknown.", priority: "high", score: 76, verification: "verified", status: "responding", updatedMinutes: 12, peopleAffected: 8, injury: false, blocked: false, resource: "Fire Unit F-12", x: 56, y: 57, reasons: ["Active fire indicator", "Occupied area", "Rapid escalation possible"], uncertainty: "Fire is verified. Exact number of occupants remains unknown.", timeline: [{ label: "Authority feed verified", detail: "10 min ago" }, { label: "Fire Unit F-12 assigned", detail: "7 min ago" }] },
-    { id: "RR-1050", type: "Road blocked", title: "Fallen tree blocking road", location: "Indiranagar 100 Feet Road", description: "A large tree is blocking two lanes. No injury has been reported.", priority: "medium", score: 48, verification: "verified", status: "monitoring", updatedMinutes: 19, peopleAffected: 0, injury: false, blocked: true, resource: "Public Works Crew P-4", x: 78, y: 60, reasons: ["Road access blocked", "Verified obstruction", "No injury reported"], uncertainty: "Extent of traffic diversion is not yet confirmed.", timeline: [{ label: "Field volunteer report", detail: "19 min ago" }, { label: "Public Works Crew P-4 assigned", detail: "14 min ago" }] }
+    { id: "RR-1047", type: "Injury", title: "Lightning injury reported", location: "Cubbon Park, north entrance", description: "One person reportedly collapsed after a nearby lightning strike. Medical assistance requested.", priority: "critical", score: 92, verification: "review", status: "new", responseStatus: "unassigned", updatedMinutes: 3, supportingReports: 1, peopleAffected: 1, injury: true, blocked: false, resource: null, x: 51, y: 48, reasons: ["Medical need reported", "Immediate danger", "Very recent report"], uncertainty: "One public report; exact patient condition is unconfirmed.", timeline: [{ label: "Citizen report received", detail: "3 min ago" }, { label: "AI suggestion created", detail: "Critical · awaiting human review" }] },
+    { id: "RR-1048", type: "Waterlogging", title: "Severe waterlogging", location: "Rajajinagar 2nd Block", description: "Waist-deep water reported across the road. A bus is stalled and local access is blocked.", priority: "critical", score: 87, verification: "review", status: "new", responseStatus: "unassigned", updatedMinutes: 8, supportingReports: 2, peopleAffected: 24, injury: false, blocked: true, resource: null, x: 25, y: 50, reasons: ["24 people may be affected", "Road access blocked", "Nearby related report"], uncertainty: "Two related reports are present, but water depth still needs responder confirmation.", timeline: [{ label: "Two reports linked", detail: "8 min ago" }, { label: "Access risk flagged", detail: "No resource assigned" }] },
+    { id: "RR-1049", type: "Fire", title: "Smoke from commercial building", location: "MG Road, Brigade junction", description: "Dark smoke visible from an upper floor. Occupancy is unknown.", priority: "high", score: 76, verification: "verified", status: "responding", responseStatus: "en-route", updatedMinutes: 12, supportingReports: 2, peopleAffected: 8, injury: false, blocked: false, resource: "Fire Unit F-12", x: 56, y: 57, reasons: ["Active fire indicator", "Occupied area", "Rapid escalation possible"], uncertainty: "Fire is verified. Exact number of occupants remains unknown.", timeline: [{ label: "Authority feed verified", detail: "10 min ago" }, { label: "Fire Unit F-12 en route", detail: "7 min ago" }] },
+    { id: "RR-1050", type: "Road blocked", title: "Fallen tree blocking road", location: "Indiranagar 100 Feet Road", description: "A large tree is blocking two lanes. No injury has been reported.", priority: "medium", score: 48, verification: "verified", status: "monitoring", responseStatus: "on-scene", updatedMinutes: 36, supportingReports: 1, peopleAffected: 0, injury: false, blocked: true, resource: "Public Works Crew P-4", x: 78, y: 60, reasons: ["Road access blocked", "Verified obstruction", "No injury reported"], uncertainty: "Extent of traffic diversion is not yet confirmed.", timeline: [{ label: "Field volunteer report", detail: "36 min ago" }, { label: "Public Works Crew P-4 on scene", detail: "14 min ago" }] }
   ];
 
   const seedResources = [
     { id: "AMB-07", name: "Ambulance A-07", kind: "Ambulance", location: "Victoria Hospital", state: "available", symbol: "+", x: 43, y: 66 },
-    { id: "FIRE-12", name: "Fire Unit F-12", kind: "Fire response", location: "MG Road", state: "assigned", symbol: "△", x: 59, y: 53 },
+    { id: "FIRE-12", name: "Fire Unit F-12", kind: "Fire response", location: "MG Road", state: "en-route", symbol: "△", x: 59, y: 53 },
     { id: "RES-03", name: "Rescue Team R-03", kind: "Rescue team", location: "Hebbal response hub", state: "available", symbol: "R", x: 73, y: 25 },
-    { id: "PWC-04", name: "Public Works Crew P-4", kind: "Road clearance", location: "Indiranagar", state: "assigned", symbol: "×", x: 80, y: 60 },
+    { id: "PWC-04", name: "Public Works Crew P-4", kind: "Road clearance", location: "Indiranagar", state: "on-scene", symbol: "×", x: 80, y: 60 },
     { id: "MED-02", name: "Medical Team M-02", kind: "Medical response", location: "NIMHANS", state: "available", symbol: "+", x: 48, y: 82 }
   ];
 
@@ -34,7 +34,7 @@
   ];
 
   function defaultState() {
-    return { incidents: JSON.parse(JSON.stringify(seedIncidents)), resources: JSON.parse(JSON.stringify(seedResources)), publicAlerts: JSON.parse(JSON.stringify(seedAlerts)), lastCitizenReportId: null, nextId: 1051 };
+    return { incidents: JSON.parse(JSON.stringify(seedIncidents)), resources: JSON.parse(JSON.stringify(seedResources)), publicAlerts: JSON.parse(JSON.stringify(seedAlerts)), lastCitizenReportId: null, feedUpdatedAt: Date.now(), nextId: 1051 };
   }
 
   function normalizeState(saved) {
@@ -46,6 +46,8 @@
       verificationNote: incident.verificationNote || "",
       latitude: incident.latitude || null,
       longitude: incident.longitude || null,
+      supportingReports: incident.supportingReports || 1,
+      responseStatus: incident.responseStatus || (incident.resource ? "assigned" : "unassigned"),
       ...incident
     }));
     return normalized;
@@ -65,6 +67,9 @@
   let currentMapFilter = "all";
   let selectedIncidentId = null;
   let broadcastPreviewReady = false;
+  let feedStatus = "ready";
+  let pendingReportData = null;
+  let pendingReportAnalysis = null;
 
   function saveState() {
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (_) { /* prototype remains functional */ }
@@ -76,6 +81,18 @@
 
   function label(value) { return String(value).replace(/-/g, " ").replace(/\b\w/g, letter => letter.toUpperCase()); }
   function relativeTime(incident) { return incident.updatedMinutes === 0 ? "just now" : `${incident.updatedMinutes} min ago`; }
+  function freshness(incident) {
+    if (incident.updatedMinutes > 30) return { key: "stale", label: "Stale" };
+    if (incident.updatedMinutes > 15) return { key: "aging", label: "Getting old" };
+    return { key: "fresh", label: "Fresh" };
+  }
+  function freshnessChip(incident) { const value = freshness(incident); return `<span class="freshness-chip ${value.key}">${value.label}</span>`; }
+  function feedRelativeTime() {
+    const seconds = Math.max(0, Math.floor((Date.now() - state.feedUpdatedAt) / 1000));
+    if (seconds < 10) return "just now";
+    if (seconds < 60) return `${seconds}s ago`;
+    return `${Math.floor(seconds / 60)} min ago`;
+  }
   function badge(value, text = label(value)) { return `<span class="badge ${esc(value)}">${esc(text)}</span>`; }
   function activeIncidents() { return state.incidents.filter(incident => incident.status !== "resolved"); }
 
@@ -122,6 +139,8 @@
     $("#unassignedCount").textContent = unassigned.length;
     $("#respondingCount").textContent = responding.length;
     $("#queueNavCount").textContent = needsReview.length;
+    $("#citizenUpdated").textContent = feedRelativeTime();
+    $("#responderUpdated").textContent = feedRelativeTime();
   }
 
   function renderPublicAlert() {
@@ -167,7 +186,8 @@
   }
 
   function markerHTML(incident) {
-    return `<button class="map-marker ${incident.verification !== "verified" ? "unverified" : ""}" style="left:${incident.x}%;top:${incident.y}%;--marker:${priorityColor[incident.priority]}" data-map-incident="${incident.id}" aria-label="${esc(incident.title)} at ${esc(incident.location)}"><span>${esc(symbols[incident.type] || "!")}</span></button>`;
+    const age = freshness(incident);
+    return `<button class="map-marker ${incident.verification !== "verified" ? "unverified" : ""} ${age.key === "stale" ? "stale" : ""}" style="left:${incident.x}%;top:${incident.y}%;--marker:${priorityColor[incident.priority]}" data-map-incident="${incident.id}" aria-label="${esc(incident.title)} at ${esc(incident.location)}, ${age.label.toLowerCase()} report"><span>${esc(symbols[incident.type] || "!")}</span></button>`;
   }
 
   function resourceMarkerHTML(resource) {
@@ -196,7 +216,24 @@
   function renderIncidentList() {
     const list = activeIncidents().sort((a, b) => priorityRank[b.priority] - priorityRank[a.priority] || a.updatedMinutes - b.updatedMinutes);
     $("#incidentCount").textContent = list.length;
-    $("#incidentList").innerHTML = list.map(incident => `<button class="incident-card" data-open-incident="${incident.id}"><div class="incident-card-top"><div><h3>${esc(incident.title)}</h3><p>${esc(incident.location)}</p></div>${badge(incident.priority)}</div><div class="incident-card-bottom">${badge(incident.verification)}<time>${esc(relativeTime(incident))}</time></div></button>`).join("");
+    const feedState = $("#feedState");
+    if (feedStatus === "loading") {
+      feedState.hidden = false;
+      feedState.className = "feed-state loading";
+      feedState.innerHTML = `<strong>Refreshing simulated feed…</strong><p>Checking incident freshness and response updates.</p>`;
+      $("#incidentList").innerHTML = "";
+      return;
+    }
+    if (feedStatus === "error") {
+      feedState.hidden = false;
+      feedState.className = "feed-state error";
+      feedState.innerHTML = `<strong>Unable to load updates</strong><p>The last known situation remains visible on the map.</p><button data-retry-feed>Try again</button>`;
+      $("#incidentList").innerHTML = "";
+      return;
+    }
+    feedState.hidden = true;
+    feedState.className = "feed-state";
+    $("#incidentList").innerHTML = list.length ? list.map(incident => `<button class="incident-card" data-open-incident="${incident.id}"><div class="incident-card-top"><div><h3>${esc(incident.title)}</h3><p>${esc(incident.location)}</p></div>${badge(incident.priority)}</div><div class="incident-card-bottom"><div class="incident-card-status">${badge(incident.verification)}${freshnessChip(incident)}</div><time>${esc(relativeTime(incident))}</time></div>${incident.supportingReports > 1 ? `<small class="support-count">${incident.supportingReports} supporting reports</small>` : ""}</button>`).join("") : `<div class="empty-state"><strong>No active incidents</strong><p>The feed is clear. New verified reports will appear here.</p></div>`;
   }
 
   function renderHelpLocations() {
@@ -207,7 +244,8 @@
     const incident = state.incidents.find(item => item.id === id);
     if (!incident) return;
     selectedIncidentId = id;
-    $("#drawerContent").innerHTML = `<div class="drawer-badges">${badge(incident.priority)}${badge(incident.verification)}</div><header class="drawer-header"><p class="eyebrow">${esc(incident.id)} · ${esc(incident.type)}</p><h2 id="drawerTitle">${esc(incident.title)}</h2><p>${esc(incident.location)} · updated ${esc(relativeTime(incident))}</p></header><section class="drawer-section"><h3>Report progress</h3>${statusStepsHTML(incident)}</section><section class="drawer-section"><h3>What is reported</h3><p>${esc(incident.description)}</p><div class="observed-grid"><span><strong>${incident.peopleAffected || "None reported"}</strong>People affected</span><span><strong>${incident.blocked ? "Blocked" : "No blockage reported"}</strong>Road access</span></div></section><section class="drawer-section"><h3>Verification and uncertainty</h3><p>${esc(incident.uncertainty)}</p></section><section class="drawer-section"><h3>Public response status</h3><p>${incident.resource ? `${esc(incident.resource)} is marked as assigned. Status: ${esc(label(incident.status))}.` : "No response resource is shown as assigned yet."}</p></section><section class="drawer-section"><p><strong>Prototype safety note:</strong> This information is simulated and does not guarantee that an area or route is safe.</p></section>`;
+    const age = freshness(incident);
+    $("#drawerContent").innerHTML = `<div class="drawer-badges">${badge(incident.priority)}${badge(incident.verification)}${freshnessChip(incident)}</div><header class="drawer-header"><p class="eyebrow">${esc(incident.id)} · ${esc(incident.type)}</p><h2 id="drawerTitle">${esc(incident.title)}</h2><p>${esc(incident.location)} · updated ${esc(relativeTime(incident))}</p>${age.key === "stale" ? `<p class="stale-warning"><strong>Information may be outdated.</strong> Conditions should be reconfirmed before action.</p>` : ""}</header><section class="drawer-section"><h3>Report progress</h3>${statusStepsHTML(incident)}</section><section class="drawer-section"><h3>What is reported</h3><p>${esc(incident.description)}</p><div class="observed-grid"><span><strong>${incident.peopleAffected || "None reported"}</strong>People affected</span><span><strong>${incident.blocked ? "Blocked" : "No blockage reported"}</strong>Road access</span><span><strong>${incident.supportingReports}</strong>Supporting reports</span><span><strong>${esc(label(incident.responseStatus))}</strong>Response stage</span></div></section><section class="drawer-section"><h3>Verification and uncertainty</h3><p>${esc(incident.uncertainty)}</p></section><section class="drawer-section"><h3>Public response status</h3><p>${incident.resource ? `${esc(incident.resource)} · ${esc(label(incident.responseStatus))}.` : incident.status === "resolved" ? "The incident is closed and its response resource has been released." : "No response resource is shown as assigned yet."}</p></section><section class="drawer-section"><p><strong>Prototype safety note:</strong> This information is simulated and does not guarantee that an area or route is safe.</p></section>`;
     $("#drawerBackdrop").hidden = false;
     $("#incidentDrawer").classList.add("is-open");
     $("#incidentDrawer").setAttribute("aria-hidden", "false");
@@ -236,7 +274,7 @@
     if (peopleAffected >= 20) { score += 18; reasons.push(`${peopleAffected} people reported affected`); }
     else if (peopleAffected > 0) { score += Math.min(12, 3 + peopleAffected); reasons.push(`${peopleAffected} people reported affected`); }
     const locationWords = location.toLowerCase().split(/\s+/).filter(word => word.length > 4);
-    const nearby = activeIncidents().find(item => locationWords.some(word => item.location.toLowerCase().includes(word)));
+    const nearby = activeIncidents().find(item => item.type === type && locationWords.some(word => item.location.toLowerCase().includes(word)));
     if (nearby) { score += 8; reasons.push(`Possible nearby match: ${nearby.id}`); }
     if (!reasons.length) reasons.push("Recent public report");
     score = Math.min(98, score);
@@ -244,25 +282,73 @@
     return { type, location, peopleAffected, injury, blocked, nearby, score, priority, reasons };
   }
 
-  function submitReport(event) {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const analysis = analyseReport(formData);
+  function createReport(formData, analysis, forceSeparate = false) {
     const positions = [[32, 68], [65, 32], [44, 75], [83, 37], [18, 71]];
     const fallbackPosition = positions[(state.nextId - 1051) % positions.length];
     const position = [Number(formData.get("mapX")) || fallbackPosition[0], Number(formData.get("mapY")) || fallbackPosition[1]];
     const id = `RR-${state.nextId++}`;
     const description = formData.get("description").trim() || `${analysis.type} reported by a citizen. Details await verification.`;
-    state.incidents.push({ id, type: analysis.type, title: `${analysis.type} reported`, location: analysis.location, description, priority: analysis.priority, score: analysis.score, verification: "unverified", status: "new", updatedMinutes: 0, peopleAffected: analysis.peopleAffected, injury: analysis.injury, blocked: analysis.blocked, resource: null, x: position[0], y: position[1], latitude: formData.get("latitude") || null, longitude: formData.get("longitude") || null, reasons: analysis.reasons, uncertainty: analysis.nearby ? `Possible duplicate of ${analysis.nearby.id}; location and conditions need human review.` : "Single public report; location and conditions need human review.", verificationChecks: { location: false, source: false, freshness: false, duplicate: false }, verificationNote: "", timeline: [{ label: "Citizen report received", detail: "Just now" }, { label: "AI suggestion created", detail: `${label(analysis.priority)} · awaiting human review` }] });
+    const reasons = forceSeparate ? [...analysis.reasons, "Reporter indicated different conditions"] : analysis.reasons;
+    state.incidents.push({ id, type: analysis.type, title: `${analysis.type} reported`, location: analysis.location, description, priority: analysis.priority, score: analysis.score, verification: "unverified", status: "new", responseStatus: "unassigned", updatedMinutes: 0, supportingReports: 1, peopleAffected: analysis.peopleAffected, injury: analysis.injury, blocked: analysis.blocked, resource: null, x: position[0], y: position[1], latitude: formData.get("latitude") || null, longitude: formData.get("longitude") || null, reasons, uncertainty: analysis.nearby ? `Possible duplicate of ${analysis.nearby.id}; reporter indicated conditions are different and human review is required.` : "Single public report; location and conditions need human review.", verificationChecks: { location: false, source: false, freshness: false, duplicate: false }, verificationNote: "", timeline: [{ label: "Citizen report received", detail: "Just now" }, { label: "AI suggestion created", detail: `${label(analysis.priority)} · awaiting human review` }] });
     state.lastCitizenReportId = id;
+    state.feedUpdatedAt = Date.now();
     saveState();
-    event.currentTarget.reset();
+    resetReportForm();
     $("#locationStatus").textContent = "Location is used only inside this browser demo.";
-    $("#locationPicker").hidden = true;
     renderAll();
     navigate("situation");
+    showReportConfirmation(id, false);
+  }
+
+  function resetReportForm() {
+    $("#incidentForm").reset();
+    $("#locationPicker").hidden = true;
+    pendingReportData = null;
+    pendingReportAnalysis = null;
+  }
+
+  function showReportConfirmation(id, supporting) {
     $("#confirmationReference").textContent = id;
+    $("#confirmationTitle").textContent = supporting ? "Your confirmation was added" : "Your report is awaiting verification";
     $("#reportConfirmationDialog").showModal();
+  }
+
+  function submitReport(event) {
+    event.preventDefault();
+    pendingReportData = new FormData(event.currentTarget);
+    pendingReportAnalysis = analyseReport(pendingReportData);
+    if (pendingReportAnalysis.nearby) {
+      const match = pendingReportAnalysis.nearby;
+      $("#duplicateMatch").innerHTML = `<strong>${esc(match.id)} · ${esc(match.title)}</strong><span>${esc(match.location)} · ${esc(relativeTime(match))} · ${match.supportingReports} supporting report${match.supportingReports === 1 ? "" : "s"}</span>`;
+      $("#duplicateDialog").showModal();
+      return;
+    }
+    createReport(pendingReportData, pendingReportAnalysis);
+  }
+
+  function confirmExistingReport() {
+    const match = pendingReportAnalysis?.nearby;
+    if (!match) return;
+    match.supportingReports += 1;
+    match.updatedMinutes = 0;
+    match.timeline.push({ label: "Citizen confirmation added", detail: `${pendingReportData.get("peopleAffected") || 0} people reported · just now` });
+    match.uncertainty = `${match.supportingReports} related reports are now linked; a responder still confirms changing conditions.`;
+    state.lastCitizenReportId = match.id;
+    state.feedUpdatedAt = Date.now();
+    saveState();
+    $("#duplicateDialog").close();
+    resetReportForm();
+    renderAll();
+    navigate("situation");
+    showReportConfirmation(match.id, true);
+  }
+
+  function reportDifferentConditions() {
+    if (!pendingReportData || !pendingReportAnalysis) return;
+    const formData = pendingReportData;
+    const analysis = pendingReportAnalysis;
+    $("#duplicateDialog").close();
+    createReport(formData, analysis, true);
   }
 
   function useCurrentLocation() {
@@ -309,13 +395,13 @@
     renderStats();
     renderResponderMap();
     const top = [...activeIncidents()].sort((a, b) => b.score - a.score)[0];
-    $("#aiFocus").innerHTML = `<p class="eyebrow">Top suggested priority</p><h2>${esc(top.title)}</h2><p>${esc(top.location)}</p><div class="focus-score"><span>${badge(top.priority)}</span><strong>${top.score}<small>/100</small></strong></div><div class="ai-reasons">${top.reasons.map(reason => `<span>${esc(reason)}</span>`).join("")}</div><p>${esc(top.uncertainty)}</p><button class="primary-button" data-review-incident="${top.id}">Review human decision →</button>`;
+    $("#aiFocus").innerHTML = top ? `<p class="eyebrow">Top suggested priority</p><h2>${esc(top.title)}</h2><p>${esc(top.location)}</p><div class="focus-score"><span>${badge(top.priority)}${freshnessChip(top)}</span><strong>${top.score}<small>/100</small></strong></div><div class="ai-reasons">${top.reasons.map(reason => `<span>${esc(reason)}</span>`).join("")}</div><p>${esc(top.uncertainty)}</p><button class="primary-button" data-review-incident="${top.id}">Review human decision →</button>` : `<div class="decision-empty"><h2>No active incidents</h2><p>The response queue is clear.</p></div>`;
   }
 
   function renderQueue() {
     const filter = $("#queueFilter").value;
     const queue = [...activeIncidents()].filter(item => filter === "all" || item.priority === filter).sort((a, b) => priorityRank[b.priority] - priorityRank[a.priority] || b.score - a.score);
-    $("#priorityQueue").innerHTML = queue.map(incident => `<button class="priority-item ${selectedIncidentId === incident.id ? "is-selected" : ""}" style="--priority:${priorityColor[incident.priority]}" data-select-incident="${incident.id}"><div><h3>${esc(incident.title)}</h3><p>${esc(incident.location)}</p><div class="priority-reasons">${incident.reasons.slice(0, 3).map(reason => `<span>${esc(reason)}</span>`).join("")}</div></div><div class="priority-meta">${badge(incident.priority)}${badge(incident.verification)}<time>${esc(relativeTime(incident))}</time></div></button>`).join("");
+    $("#priorityQueue").innerHTML = queue.length ? queue.map(incident => `<button class="priority-item ${selectedIncidentId === incident.id ? "is-selected" : ""}" style="--priority:${priorityColor[incident.priority]}" data-select-incident="${incident.id}"><div><h3>${esc(incident.title)}</h3><p>${esc(incident.location)}</p><div class="priority-reasons">${incident.reasons.slice(0, 3).map(reason => `<span>${esc(reason)}</span>`).join("")}</div></div><div class="priority-meta">${badge(incident.priority)}${badge(incident.verification)}${freshnessChip(incident)}<time>${esc(relativeTime(incident))}</time></div></button>`).join("") : `<div class="empty-state"><strong>No incidents in this queue</strong><p>Change the filter or wait for a new report.</p></div>`;
     if (selectedIncidentId && state.incidents.some(item => item.id === selectedIncidentId)) renderDecisionPanel(selectedIncidentId);
   }
 
@@ -332,13 +418,32 @@
     }).sort((a, b) => b.score - a.score);
   }
 
+  function makeDecisionSectionsCollapsible() {
+    $$(".decision-section", $("#decisionPanel")).forEach((section, index) => {
+      const heading = $("h3", section);
+      if (!heading) return;
+      section.classList.add("decision-fold");
+      heading.setAttribute("role", "button");
+      heading.setAttribute("tabindex", "0");
+      const setExpanded = expanded => {
+        section.classList.toggle("is-collapsed", !expanded);
+        heading.setAttribute("aria-expanded", String(expanded));
+      };
+      setExpanded(!(window.matchMedia("(max-width: 720px)").matches && [0, 1, 5].includes(index)));
+      const toggle = () => setExpanded(section.classList.contains("is-collapsed"));
+      heading.addEventListener("click", toggle);
+      heading.addEventListener("keydown", event => { if (["Enter", " "].includes(event.key)) { event.preventDefault(); toggle(); } });
+    });
+  }
+
   function renderDecisionPanel(id) {
     const incident = state.incidents.find(item => item.id === id);
     if (!incident) return;
     selectedIncidentId = id;
     const checks = incident.verificationChecks || { location: false, source: false, freshness: false, duplicate: false };
     const recommendations = resourceRecommendations(incident);
-    $("#decisionPanel").innerHTML = `<div class="decision-top"><div><div class="drawer-badges">${badge(incident.priority)}${badge(incident.verification)}</div><h2>${esc(incident.title)}</h2><p>${esc(incident.location)} · ${esc(relativeTime(incident))}</p></div><div class="score-ring" style="--score:${incident.score}"><strong>${incident.score}</strong></div></div><section class="decision-section"><h3>Observed information</h3><div class="observed-grid"><span><strong>${incident.peopleAffected || "0"}</strong>People reported affected</span><span><strong>${incident.injury ? "Yes" : "Not reported"}</strong>Medical need</span><span><strong>${incident.blocked ? "Blocked" : "Open / unknown"}</strong>Road access</span><span><strong>${label(incident.verification)}</strong>Verification</span></div></section><section class="decision-section"><h3>Why AI suggests ${esc(incident.priority)} priority</h3><div class="reason-list">${incident.reasons.map(reason => `<span>${esc(reason)}</span>`).join("")}</div><p class="uncertainty"><strong>Uncertainty:</strong> ${esc(incident.uncertainty)}</p></section><section class="decision-section"><h3>Verification checklist</h3><div class="verification-checklist"><label><input id="verifyLocation" type="checkbox" ${checks.location ? "checked" : ""}>Location or map pin checked</label><label><input id="verifySource" type="checkbox" ${checks.source ? "checked" : ""}>Supporting source or field report reviewed</label><label><input id="verifyFreshness" type="checkbox" ${checks.freshness ? "checked" : ""}>Freshness and changing conditions checked</label><label><input id="verifyDuplicate" type="checkbox" ${checks.duplicate ? "checked" : ""}>Possible duplicate or conflicting report reviewed</label></div><label class="verification-note">Verification note<textarea id="verificationNote" rows="2" placeholder="Briefly record how the report was checked">${esc(incident.verificationNote || "")}</textarea></label></section><section class="decision-section"><span class="recommendation-tag">Suggested resource match</span><h3>Choose response resource</h3><div class="resource-recommendations">${recommendations.map((resource, index) => `<label class="resource-option ${index === 0 && resource.available ? "is-best" : ""} ${!resource.available ? "is-unavailable" : ""}"><input type="radio" name="decisionResource" value="${esc(resource.name)}" ${(incident.resource === resource.name || (!incident.resource && index === 0 && resource.available)) ? "checked" : ""} ${!resource.available ? "disabled" : ""}><span><strong>${esc(resource.name)}</strong><small>${esc(resource.kind)} · ${resource.distance} km away · ${esc(resource.fit)}</small></span><em>${resource.available ? `${resource.eta} min ETA` : "Assigned"}</em></label>`).join("")}</div></section><section class="decision-section"><h3>Response decision</h3><div class="decision-controls"><label>Response status<select id="decisionStatus"><option value="new" ${incident.status === "new" ? "selected" : ""}>New</option><option value="responding" ${incident.status === "responding" ? "selected" : ""}>Responding</option><option value="monitoring" ${incident.status === "monitoring" ? "selected" : ""}>Monitoring</option><option value="resolved" ${incident.status === "resolved" ? "selected" : ""}>Resolved</option></select></label></div><div class="decision-actions"><button class="secondary-button" id="saveDecisionButton">Save review</button><button class="primary-button" id="verifyDispatchButton">Verify & dispatch</button></div></section><section class="decision-section"><h3>Decision timeline</h3><ol class="timeline">${incident.timeline.slice().reverse().map(event => `<li><strong>${esc(event.label)}</strong>${esc(event.detail)}</li>`).join("")}</ol></section>`;
+    $("#decisionPanel").innerHTML = `<div class="decision-top"><div><div class="drawer-badges">${badge(incident.priority)}${badge(incident.verification)}${freshnessChip(incident)}</div><h2>${esc(incident.title)}</h2><p>${esc(incident.location)} · ${esc(relativeTime(incident))}</p></div><div class="score-ring" style="--score:${incident.score}"><strong>${incident.score}</strong></div></div><section class="decision-section"><h3>Observed information</h3><div class="observed-grid"><span><strong>${incident.peopleAffected || "0"}</strong>People reported affected</span><span><strong>${incident.injury ? "Yes" : "Not reported"}</strong>Medical need</span><span><strong>${incident.blocked ? "Blocked" : "Open / unknown"}</strong>Road access</span><span><strong>${label(incident.verification)}</strong>Verification</span><span><strong>${incident.supportingReports}</strong>Supporting reports</span><span><strong>${label(incident.responseStatus)}</strong>Response stage</span></div></section><section class="decision-section"><h3>Why AI suggests ${esc(incident.priority)} priority</h3><div class="reason-list">${incident.reasons.map(reason => `<span>${esc(reason)}</span>`).join("")}</div><p class="uncertainty"><strong>Uncertainty:</strong> ${esc(incident.uncertainty)}</p>${freshness(incident).key === "stale" ? `<p class="stale-warning"><strong>Stale report:</strong> reconfirm changing conditions before dispatch.</p>` : ""}</section><section class="decision-section"><h3>Verification checklist</h3><div class="verification-checklist"><label><input id="verifyLocation" type="checkbox" ${checks.location ? "checked" : ""}>Location or map pin checked</label><label><input id="verifySource" type="checkbox" ${checks.source ? "checked" : ""}>Supporting source or field report reviewed</label><label><input id="verifyFreshness" type="checkbox" ${checks.freshness ? "checked" : ""}>Freshness and changing conditions checked</label><label><input id="verifyDuplicate" type="checkbox" ${checks.duplicate ? "checked" : ""}>Possible duplicate or conflicting report reviewed</label></div><label class="verification-note">Verification note<textarea id="verificationNote" rows="2" placeholder="Briefly record how the report was checked">${esc(incident.verificationNote || "")}</textarea></label></section><section class="decision-section"><span class="recommendation-tag">Suggested resource match</span><h3>Choose response resource</h3><div class="resource-recommendations">${recommendations.map((resource, index) => `<label class="resource-option ${index === 0 && resource.available ? "is-best" : ""} ${!resource.available ? "is-unavailable" : ""}"><input type="radio" name="decisionResource" value="${esc(resource.name)}" ${(incident.resource === resource.name || (!incident.resource && index === 0 && resource.available)) ? "checked" : ""} ${!resource.available ? "disabled" : ""}><span><strong>${esc(resource.name)}</strong><small>${esc(resource.kind)} · ${resource.distance} km away · ${esc(resource.fit)}</small></span><em>${resource.available ? `${resource.eta} min ETA` : "Assigned"}</em></label>`).join("")}</div></section><section class="decision-section"><h3>Response decision</h3><div class="decision-controls"><label>Incident status<select id="decisionStatus"><option value="new" ${incident.status === "new" ? "selected" : ""}>New</option><option value="responding" ${incident.status === "responding" ? "selected" : ""}>Responding</option><option value="monitoring" ${incident.status === "monitoring" ? "selected" : ""}>Monitoring</option><option value="resolved" ${incident.status === "resolved" ? "selected" : ""}>Resolved</option></select></label><label>Resource stage<select id="responseStage"><option value="assigned" ${incident.responseStatus === "assigned" ? "selected" : ""}>Assigned</option><option value="en-route" ${incident.responseStatus === "en-route" ? "selected" : ""}>En route</option><option value="on-scene" ${incident.responseStatus === "on-scene" ? "selected" : ""}>On scene</option><option value="released" ${incident.responseStatus === "released" ? "selected" : ""}>Released</option></select></label></div><div class="decision-actions"><button class="secondary-button" id="saveDecisionButton">Save review</button><button class="primary-button" id="verifyDispatchButton">Verify & dispatch</button></div></section><section class="decision-section"><h3>Decision timeline</h3><ol class="timeline">${incident.timeline.slice().reverse().map(event => `<li><strong>${esc(event.label)}</strong>${esc(event.detail)}</li>`).join("")}</ol></section>`;
+    makeDecisionSectionsCollapsible();
     $$(".priority-item").forEach(item => item.classList.toggle("is-selected", item.dataset.selectIncident === id));
   }
 
@@ -349,7 +454,9 @@
     const checks = { location: $("#verifyLocation").checked, source: $("#verifySource").checked, freshness: $("#verifyFreshness").checked, duplicate: $("#verifyDuplicate").checked };
     const verificationNote = $("#verificationNote").value.trim();
     const selectedResource = $('input[name="decisionResource"]:checked');
-    const resource = selectedResource?.value || null;
+    let resource = incident.resource || (verify ? selectedResource?.value : null) || null;
+    let responseStage = $("#responseStage").value;
+    if (!resource && !verify) responseStage = "unassigned";
     if (verify && (!Object.values(checks).every(Boolean) || !verificationNote)) {
       toast("Verification is incomplete", "Complete all four checks and add a short verification note before dispatching.");
       return;
@@ -362,13 +469,21 @@
     incident.verificationNote = verificationNote;
     incident.resource = resource;
     incident.status = $("#decisionStatus").value;
-    if (verify) { incident.verification = "verified"; if (incident.status === "new" && resource) incident.status = "responding"; }
+    if (verify) { incident.verification = "verified"; if (incident.status === "new" && resource) incident.status = "responding"; if (incident.responseStatus === "unassigned") responseStage = "assigned"; }
+    if (incident.status === "resolved") responseStage = "released";
+    incident.responseStatus = responseStage;
     incident.updatedMinutes = 0;
     state.resources.forEach(item => {
       if (item.name === previousResource && item.name !== resource) item.state = "available";
-      if (item.name === resource) item.state = "assigned";
+      if (item.name === resource) item.state = responseStage === "released" ? "available" : responseStage;
     });
-    incident.timeline.push({ label: verify ? "Coordinator verified response" : "Verification review saved", detail: `${resource ? `${resource} · ` : ""}just now` });
+    if (responseStage === "released") {
+      incident.lastResource = resource || previousResource;
+      incident.resource = null;
+      resource = null;
+    }
+    incident.timeline.push({ label: responseStage === "released" ? "Response resource released" : verify ? "Coordinator verified response" : "Verification review saved", detail: `${incident.resource || incident.lastResource || "No resource"} · ${label(responseStage)} · just now` });
+    state.feedUpdatedAt = Date.now();
     saveState();
     renderAll();
     renderDecisionPanel(incident.id);
@@ -378,9 +493,45 @@
   function renderResources() {
     const available = state.resources.filter(resource => resource.state === "available");
     $("#availableResourceCount").textContent = `${available.length} available`;
-    $("#resourceList").innerHTML = state.resources.map(resource => `<article class="resource-item"><span class="resource-symbol">${esc(resource.symbol)}</span><div><strong>${esc(resource.name)}</strong><small>${esc(resource.kind)} · ${esc(resource.location)}</small></div><span class="resource-state ${resource.state}">${esc(label(resource.state))}</span></article>`).join("");
+    $("#resourceList").innerHTML = state.resources.map(resource => {
+      const incident = state.incidents.find(item => item.resource === resource.name);
+      const lifecycle = resource.state === "available"
+        ? `<span class="resource-state available">Available</span>`
+        : `<div class="lifecycle-controls"><span class="resource-state ${resource.state}">${esc(label(resource.state))}</span><label class="sr-only" for="resource-stage-${resource.id}">Update ${esc(resource.name)} stage</label><select id="resource-stage-${resource.id}" data-resource-stage="${resource.id}"><option value="assigned" ${resource.state === "assigned" ? "selected" : ""}>Assigned</option><option value="en-route" ${resource.state === "en-route" ? "selected" : ""}>En route</option><option value="on-scene" ${resource.state === "on-scene" ? "selected" : ""}>On scene</option><option value="released">Release</option></select></div>`;
+      return `<article class="resource-item"><span class="resource-symbol">${esc(resource.symbol)}</span><div><strong>${esc(resource.name)}</strong><small>${esc(resource.kind)} · ${esc(resource.location)}</small>${incident ? `<small class="support-count">Linked to ${esc(incident.id)}</small>` : ""}</div><div class="resource-meta">${lifecycle}</div></article>`;
+    }).join("");
     const incidents = activeIncidents();
     $("#broadcastIncident").innerHTML = `<option value="">Select incident</option>${incidents.map(item => `<option value="${item.id}">${esc(item.id)} · ${esc(item.title)}</option>`).join("")}`;
+  }
+
+  function updateResourceStage(resourceId, nextStage) {
+    const resource = state.resources.find(item => item.id === resourceId);
+    if (!resource) return;
+    const incident = state.incidents.find(item => item.resource === resource.name);
+    if (nextStage === "released") {
+      resource.state = "available";
+      if (incident) {
+        incident.lastResource = resource.name;
+        incident.resource = null;
+        incident.responseStatus = "released";
+        incident.updatedMinutes = 0;
+        incident.timeline.push({ label: "Response resource released", detail: `${resource.name} · just now` });
+      }
+      toast("Resource released", `${resource.name} is available for another incident.`);
+    } else {
+      resource.state = nextStage;
+      if (incident) {
+        incident.responseStatus = nextStage;
+        incident.status = "responding";
+        incident.updatedMinutes = 0;
+        incident.timeline.push({ label: `Response ${label(nextStage)}`, detail: `${resource.name} · just now` });
+      }
+      toast("Response stage updated", `${resource.name} · ${label(nextStage)}`);
+    }
+    state.feedUpdatedAt = Date.now();
+    saveState();
+    renderAll();
+    if (currentView === "resources") renderResources();
   }
 
   function prepareBroadcast() {
@@ -418,10 +569,38 @@
   function resetDemo() {
     state = defaultState();
     selectedIncidentId = null;
+    feedStatus = "ready";
+    pendingReportData = null;
+    pendingReportAnalysis = null;
+    broadcastPreviewReady = false;
     saveState();
     renderAll();
-    renderOverview();
+    if (role === "responder") renderOverview();
     toast("Demo restored", "The original incident and resource scenario is ready.");
+  }
+
+  function refreshFeed() {
+    if (feedStatus === "loading") return;
+    feedStatus = "loading";
+    $$('[data-refresh-feed]').forEach(button => { button.classList.add("is-loading"); button.textContent = "Refreshing…"; });
+    renderIncidentList();
+    setTimeout(() => {
+      feedStatus = "ready";
+      state.feedUpdatedAt = Date.now();
+      saveState();
+      renderAll();
+      if (role === "responder" && currentView === "overview") renderOverview();
+      $$('[data-refresh-feed]').forEach(button => { button.classList.remove("is-loading"); button.textContent = "↻ Refresh"; });
+      toast("Situation refreshed", "The latest simulated incident and resource state is shown.");
+    }, 550);
+  }
+
+  function startWalkthrough() {
+    resetDemo();
+    if ($("#guideDialog").open) $("#guideDialog").close();
+    setRole("citizen");
+    navigate("situation");
+    toast("Walkthrough started", "Begin with the shared incident map, then submit the compact report.");
   }
 
   function toast(title, detail) {
@@ -455,7 +634,12 @@
       if (nav) navigate(nav.dataset.view);
       if (go) { event.preventDefault(); navigate(go.dataset.goView); }
       if (opener) openIncident(opener.dataset.openIncident);
-      if (marker) showMapCallout(marker.dataset.mapIncident);
+      if (marker) {
+        if (role === "responder") {
+          navigate("queue");
+          setTimeout(() => { renderDecisionPanel(marker.dataset.mapIncident); $("#decisionPanel").scrollIntoView({ behavior: "smooth", block: "start" }); }, 0);
+        } else showMapCallout(marker.dataset.mapIncident);
+      }
       if (resource) {
         const item = state.resources.find(entry => entry.id === resource.dataset.resourceId);
         if (item) toast("Available response resource", `${item.name} · ${item.location}`);
@@ -465,6 +649,7 @@
       if (demoLocation) chooseDemoLocation(demoLocation);
       if (event.target.id === "saveDecisionButton") saveDecision(false);
       if (event.target.id === "verifyDispatchButton") saveDecision(true);
+      if (event.target.closest("[data-retry-feed]")) refreshFeed();
     });
     $$("[data-map-filter]").forEach(button => button.addEventListener("click", () => {
       currentMapFilter = button.dataset.mapFilter;
@@ -480,11 +665,23 @@
     $("#useLocationButton").addEventListener("click", useCurrentLocation);
     $("#choosePinButton").addEventListener("click", () => { $("#locationPicker").hidden = !$("#locationPicker").hidden; });
     $("#confirmationClose").addEventListener("click", () => $("#reportConfirmationDialog").close());
+    $("#duplicateClose").addEventListener("click", () => { $("#duplicateDialog").close(); pendingReportData = null; pendingReportAnalysis = null; });
+    $("#confirmExistingButton").addEventListener("click", confirmExistingReport);
+    $("#reportDifferentButton").addEventListener("click", reportDifferentConditions);
     $("#trackReportButton").addEventListener("click", () => { $("#reportConfirmationDialog").close(); navigate("situation"); setTimeout(() => $("#recentReportPanel").scrollIntoView({ behavior: "smooth", block: "center" }), 0); });
-    $("#responderLoginButton").addEventListener("click", () => $("#loginDialog").showModal());
+    $("#responderLoginButton").addEventListener("click", () => { $("#loginError").hidden = true; $("#loginDialog").showModal(); });
     $("#loginClose").addEventListener("click", () => $("#loginDialog").close());
     $("#loginDialog").addEventListener("click", event => { if (event.target === $("#loginDialog")) $("#loginDialog").close(); });
-    $("#loginForm").addEventListener("submit", event => { event.preventDefault(); $("#loginDialog").close(); setRole("responder"); toast("Responder demo opened", "Actions remain simulated until a secure backend is connected."); });
+    $("#loginForm").addEventListener("submit", event => {
+      event.preventDefault();
+      const form = new FormData(event.currentTarget);
+      const valid = form.get("responderId") === "RR-DEMO-01" && form.get("password") === "demo";
+      $("#loginError").hidden = valid;
+      if (!valid) { event.currentTarget.elements.responderId.focus(); return; }
+      $("#loginDialog").close();
+      setRole("responder");
+      toast("Responder demo opened", "Actions remain simulated until a secure backend is connected.");
+    });
     $("#signOutButton").addEventListener("click", () => { setRole("citizen"); toast("Signed out", "Public citizen access remains available without an account."); });
     $("#queueFilter").addEventListener("change", renderQueue);
     $("#broadcastIncident").addEventListener("change", prepareBroadcast);
@@ -492,9 +689,21 @@
     $("#publishBroadcastButton").addEventListener("click", publishBroadcast);
     $("#broadcastMessage").addEventListener("input", () => { broadcastPreviewReady = false; $("#publishBroadcastButton").disabled = true; });
     $("#resetDemoButton").addEventListener("click", resetDemo);
+    $$('[data-refresh-feed]').forEach(button => button.addEventListener("click", refreshFeed));
+    $("#resourceList").addEventListener("change", event => { const select = event.target.closest("[data-resource-stage]"); if (select) updateResourceStage(select.dataset.resourceStage, select.value); });
+    $("#demoGuideButton").addEventListener("click", () => $("#guideDialog").showModal());
+    $("#guideClose").addEventListener("click", () => $("#guideDialog").close());
+    $("#resetFromGuideButton").addEventListener("click", resetDemo);
+    $("#startGuideButton").addEventListener("click", startWalkthrough);
     document.addEventListener("keydown", event => { if (event.key === "Escape" && $("#incidentDrawer").classList.contains("is-open")) closeDrawer(); });
   }
 
   bindEvents();
   renderAll();
+  setInterval(() => {
+    state.incidents.forEach(incident => { incident.updatedMinutes += 1; });
+    state.publicAlerts.forEach(alert => { alert.updatedMinutes += 1; });
+    renderAll();
+    if (role === "responder" && currentView === "overview") renderOverview();
+  }, 60000);
 })();
